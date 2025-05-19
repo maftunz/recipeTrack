@@ -10,6 +10,10 @@ def get_region_by_name(name):
     return Region.objects.filter(name_ru=name).first()
 
 @sync_to_async
+def get_organization_by_name(name):
+    return Organization.objects.filter(name=name).first()
+
+@sync_to_async
 def get_registered_user(telegram_id: int):
     return User.objects.filter(telegram_id=telegram_id).first()
 
@@ -41,8 +45,8 @@ def save_user(data):
         organization_id=organization_id,
         phone=data["phone"],
         is_active=True,
-        language=Language.RU,
         telegram_id=data["telegram_id"],
+        language=data["lang"]
     )
 
     token = data.get("invite_token")

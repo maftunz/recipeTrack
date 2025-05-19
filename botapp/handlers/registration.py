@@ -10,10 +10,11 @@ from aiogram.types import ReplyKeyboardRemove
 
 from app.enums import UserType
 
-from ..keyboards import get_user_type_keyboard, get_regions_keyboard, get_phone_request_keyboard
+from ..keyboards import get_user_type_keyboard, get_regions_keyboard, get_phone_request_keyboard, get_language_keyboard
 from ..states import Registration
 from ..services import (
-    get_all_regions, get_region_by_name, get_registered_user, get_active_invite_link, save_user
+    get_all_regions, get_region_by_name, get_registered_user, get_active_invite_link, save_user,
+    get_organization_by_name
 )
 
 # ========== ROUTER ==========
@@ -25,21 +26,46 @@ registration_router = Router()
 async def start_registration(message: types.Message, command: CommandObject, state: FSMContext):
     token = command.args
     telegram_id = message.from_user.id
-    lang = "ru"
-    await state.update_data(lang=lang)
 
     existing_user = await get_registered_user(telegram_id)
     if existing_user:
-        await message.answer(f"Добро пожаловать, {existing_user.full_name}!")
+        if existing_user.language == "ru":
+            await message.answer(f"Добро пожаловать, {existing_user.full_name}!")
+        else:
+            await message.answer(f"Xush kelibsiz, {existing_user.full_name}!")
         await state.clear()
         return
 
-    invite = await get_active_invite_link(token)
-    if invite:
-        await state.update_data(invite_token=token, organization_id=invite.organization_id)
+    if token:
+        invite = await get_active_invite_link(token)
+        if invite:
+            await state.update_data(invite_token=token, organization_id=invite.organization_id)
 
-    await message.answer("Добро пожаловать! Пожалуйста, выберите, кто вы? Врач или фармацевт?",
-                         reply_markup=get_user_type_keyboard(lang))
+    await message.answer("Пожалуйста, выберите язык:\nIltimos, tilni tanlang:", reply_markup=get_language_keyboard())
+    await state.set_state(Registration.choosing_language)
+
+
+@registration_router.message(Registration.choosing_language)
+async def language_selected(message: types.Message, state: FSMContext):
+    lang_map = {
+        "Русский 🇷🇺": "ru",
+        "O'zbek 🇺🇿": "uz"
+    }
+
+    lang = lang_map.get(message.text)
+    if not lang:
+        await message.answer("Пожалуйста, выберите язык с помощью кнопок.\nIltimos, tugmalar yordamida tilni tanlang.")
+        return
+
+    await state.update_data(lang=lang)
+
+    if lang == "ru":
+        await message.answer("Добро пожаловать! Пожалуйста, выберите, кто вы? Врач или фармацевт?",
+                             reply_markup=get_user_type_keyboard(lang))
+    else:
+        await message.answer("Xush kelibsiz! Iltimos, tanlang siz kimsiz? Shifokor yoki farmatsevt?",
+                             reply_markup=get_user_type_keyboard(lang))
+
     await state.set_state(Registration.choosing_user_type)
 
 
@@ -49,11 +75,17 @@ async def user_type_selected(message: types.Message, state: FSMContext):
     lang = user_data['lang']
     user_type = UserType.key_by_label(message.text, lang)
     if not user_type:
-        await message.answer("Пожалуйста, выберите: Врач или Фармацевт.")
+        if lang == "ru":
+            await message.answer("Пожалуйста, выберите: Врач или Фармацевт.")
+        else:
+            await message.answer("Iltimos, tanlang: Shifokor yoki farmatsevt.")
         return
 
     await state.update_data(user_type=user_type)
-    await message.answer("Введите ваше ФИО:", reply_markup=ReplyKeyboardRemove())
+    if lang == "ru":
+        await message.answer("Введите ваше ФИО:", reply_markup=ReplyKeyboardRemove())
+    else:
+        await message.answer("Toʻliq ism familiyangizni kiriting:", reply_markup=ReplyKeyboardRemove())
     await state.set_state(Registration.entering_full_name)
 
 
@@ -61,10 +93,15 @@ async def user_type_selected(message: types.Message, state: FSMContext):
 async def full_name_entered(message: types.Message, state: FSMContext):
     await state.update_data(full_name=message.text)
     data = await state.get_data()
+    lang = data['lang']
 
     if data.get("organization_id"):
-        await message.answer("Пожалуйста, отправьте ваш номер телефона, используя кнопку ниже:",
-                             reply_markup=get_phone_request_keyboard())
+        if lang == "ru":
+            await message.answer("Пожалуйста, отправьте ваш номер телефона, используя кнопку ниже:",
+                             reply_markup=get_phone_request_keyboard(lang))
+        else:
+            await message.answer("Iltimos, quyidagi tugma orqali telefon raqamingizni yuboring:",
+                                 reply_markup=get_phone_request_keyboard(lang))
         await state.set_state(Registration.entering_phone)
     else:
         regions = await get_all_regions()
@@ -74,30 +111,52 @@ async def full_name_entered(message: types.Message, state: FSMContext):
 
 @registration_router.message(Registration.choosing_region)
 async def region_selected(message: types.Message, state: FSMContext):
-    # Здесь можно проверить регион на валидность
     region = await get_region_by_name(message.text.strip())
+    data = await state.get_data()
+    lang = data['lang']
     if not region:
-        await message.answer("Пожалуйста, выберите регион из предложенных кнопок.")
+        if lang == "ru":
+            await message.answer("Пожалуйста, выберите регион из предложенных кнопок.")
+        else:
+            await message.answer("Iltimos, taklif etilgan tugmalardan birini bosib, hududingizni tanlang.")
         return
 
     await state.update_data(region_id=region.id)
-    await message.answer("Введите название вашей организации:")
+    if lang == "ru":
+        await message.answer("Введите название вашей организации:")
+    else:
+        await message.answer("Tashkilotingiz nomini kiriting:")
     await state.set_state(Registration.choosing_organization)
 
 
 @registration_router.message(Registration.choosing_organization)
 async def organization_entered(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data['lang']
     await state.update_data(organization=message.text)
-    await message.answer("Пожалуйста, отправьте ваш номер телефона, используя кнопку ниже:",
-                         reply_markup=get_phone_request_keyboard())
+    organization = await get_organization_by_name(message.text.strip())
+    if organization:
+        await state.update_data(organization_id=organization.id)
+
+    if lang == "ru":
+        await message.answer("Пожалуйста, отправьте ваш номер телефона, используя кнопку ниже:",
+                         reply_markup=get_phone_request_keyboard(lang))
+    else:
+        await message.answer("Iltimos, quyidagi tugma orqali telefon raqamingizni yuboring:",
+                             reply_markup=get_phone_request_keyboard(lang))
     await state.set_state(Registration.entering_phone)
 
 
 @registration_router.message(F.content_type == types.ContentType.CONTACT, Registration.entering_phone)
 async def phone_received(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data['lang']
     contact = message.contact
     if not contact or not contact.phone_number:
-        await message.answer("Не удалось получить номер телефона. Пожалуйста, попробуйте снова.")
+        if lang == "ru":
+            await message.answer("Не удалось получить номер телефона. Пожалуйста, попробуйте снова.")
+        else:
+            await message.answer("Telefon raqamingizni olishning imkoni bo‘lmadi. Iltimos, qayta urinib ko‘ring.")
         return
 
     await state.update_data(
@@ -108,5 +167,9 @@ async def phone_received(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     await save_user(user_data)
 
-    await message.answer(f"Спасибо за регистрацию! Вы успешно зарегистрированы.", reply_markup=ReplyKeyboardRemove())
+    if lang == "ru":
+        await message.answer(f"Спасибо! Вы успешно зарегистрированы.", reply_markup=ReplyKeyboardRemove())
+    else:
+        await message.answer(f"Rahmat! Siz muvaffaqiyatli ro‘yxatdan o‘tdingiz.",
+                             reply_markup=ReplyKeyboardRemove())
     await state.clear()

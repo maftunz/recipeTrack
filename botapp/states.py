@@ -6,6 +6,7 @@ django.setup()
 from aiogram.fsm.state import State, StatesGroup
 
 class Registration(StatesGroup):
+    choosing_language = State()
     choosing_user_type = State()
     entering_full_name = State()
     choosing_region = State()
