@@ -12,3 +12,9 @@ class Registration(StatesGroup):
     choosing_region = State()
     choosing_organization = State()
     entering_phone = State()
+
+class RecipeTrack(StatesGroup):
+    request_recipe = State()
+    sending_recipe = State()
+    request_cheque = State()
+    sending_cheque = State()

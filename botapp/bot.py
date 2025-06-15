@@ -11,6 +11,7 @@ from botapp.handlers.registration import registration_router
 
 # Настройка Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "recipe_track.settings")
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 django.setup()
 
 # Загрузка токена

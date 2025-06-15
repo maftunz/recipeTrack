@@ -71,7 +71,10 @@ class User(models.Model):
 
 class Receipt(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)
     photo = models.CharField(max_length=255)
+    ofd_url = models.CharField(max_length=255, null=True, blank=True)
+    items = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField(
         max_length=20,
@@ -92,3 +95,13 @@ class InviteLink(models.Model):
     organization = models.ForeignKey(Organization, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} – {self.price}"

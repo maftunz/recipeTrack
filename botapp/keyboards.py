@@ -1,5 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
+from app.enums import UserType
+
 
 def get_language_keyboard():
     keyboard = ReplyKeyboardMarkup(
@@ -51,3 +53,24 @@ def get_phone_request_keyboard(lang) -> ReplyKeyboardMarkup:
         resize_keyboard=True,
         one_time_keyboard=True
     )
+
+def get_user_menu(user_type: str, lang: str = "ru") -> ReplyKeyboardMarkup:
+    if user_type == UserType.DOCTOR.value:
+        if lang == 'uz':
+            label = "📄 Retseptni yuborish"
+        else:
+            label = "📄 Отправить рецепт"
+    elif user_type == UserType.PHARMACIST.value:
+        if lang == 'uz':
+            label = "📄 Chekni yuborish"
+        else:
+            label = "🧾 Отправить чек"
+    else:
+        if lang == 'uz':
+            label = "🔙 Orqaga"
+        else:
+            label = "🔙 Назад"
+
+    return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+            [KeyboardButton(text=label)]
+        ])
