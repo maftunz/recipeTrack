@@ -7,6 +7,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.strategy import FSMStrategy
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from botapp.handlers.receipt import receipt_router
 from botapp.handlers.registration import registration_router
 
 # Настройка Django
@@ -25,6 +26,7 @@ dp = Dispatcher(storage=storage, fsm_strategy=FSMStrategy.CHAT)
 
 # Подключение маршрутов
 dp.include_router(registration_router)
+dp.include_router(receipt_router)
 
 # Основной запуск
 async def main():
