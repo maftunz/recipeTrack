@@ -90,6 +90,8 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
             items = await parse_ofd_page(ofd_url)
             total_amount = sum(item['price_sum'] for item in items)
             total_quantity = sum(item['qty'] for item in items)
+            if total_quantity > 0:
+                status = ReceiptStatus.APPROVED.value
         except Exception as e:
             print(f"Ошибка при парсинге OфД: {e}")
 
