@@ -83,9 +83,7 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
     items = []
     total_amount = None
     total_quantity = None
-    ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
     if ofd_url:
-        ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
         try:
             items = await parse_ofd_page(ofd_url)
             total_amount = sum(item['price_sum'] for item in items)
