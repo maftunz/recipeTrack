@@ -9,7 +9,7 @@ from .models import (
     Region, Organization, User, Admin, Receipt, InviteLink
 )
 
-bot_username = 'recipe_track_bot'
+bot_username = 'shifokor_soft_bot'
 
 
 @admin.register(Region)
