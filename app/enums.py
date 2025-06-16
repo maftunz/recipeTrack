@@ -53,3 +53,8 @@ class OrganizationType(TextChoices):
 class Language(TextChoices):
     RU = 'ru', 'Russian'
     UZ = 'uz', 'Uzbek'
+
+
+class ReceiptType(TextChoices):
+    PRESCRIPTION = 'prescription', 'Рецепт'
+    CHECK = 'check', 'Чек'

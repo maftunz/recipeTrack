@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User as AuthUser
-from .enums import ReceiptStatus
+from .enums import ReceiptStatus, ReceiptType
 from .enums import UserType
 from .enums import OrganizationType
 from .enums import Language
@@ -76,6 +76,13 @@ class Receipt(models.Model):
     ofd_url = models.CharField(max_length=255, null=True, blank=True)
     items = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    quantity = models.PositiveIntegerField(null=True, blank=True)
+    type = models.CharField(
+        max_length=20,
+        choices=ReceiptType.choices,
+        null=True,
+        blank=True
+    )
     status = models.CharField(
         max_length=20,
         choices=ReceiptStatus.choices,

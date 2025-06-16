@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from asgiref.sync import sync_to_async
 
-from app.enums import ReceiptStatus
+from app.enums import ReceiptStatus, ReceiptType, UserType
 from app.models import User, Organization, Region, OrganizationType, InviteLink, Receipt, Product
 
 from bs4 import BeautifulSoup
@@ -82,12 +82,14 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
 
     items = []
     total_amount = None
-
+    total_quantity = None
+    ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
     if ofd_url:
-        ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25743&c=20250515033402&s=445254942941"
+        ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
         try:
             items = await parse_ofd_page(ofd_url)
             total_amount = sum(item['price_sum'] for item in items)
+            total_quantity = sum(item['qty'] for item in items)
         except Exception as e:
             print(f"Ошибка при парсинге OфД: {e}")
 
@@ -96,6 +98,8 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
         ofd_url=ofd_url,
         items=items if items else None,
         amount=total_amount,
+        quantity=total_quantity,
+        type=ReceiptType.CHECK.value if user.user_type == UserType.PHARMACIST.value else ReceiptType.PRESCRIPTION.value,
         user_id=user.id,
         organization_id=user.organization_id,
         status=status,
