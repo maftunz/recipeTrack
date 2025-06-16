@@ -24,10 +24,6 @@ registration_router = Router()
 @registration_router.message(CommandStart(deep_link=True))
 @registration_router.message(Command(commands=["start", "register"]))
 async def start_registration(message: types.Message, command: CommandObject, state: FSMContext):
-    ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
-    items = await parse_ofd_page(ofd_url)
-    print(f"Товары: {items}")
-
     token = command.args
     telegram_id = message.from_user.id
 

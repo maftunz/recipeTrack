@@ -6,7 +6,7 @@ from app.enums import ReceiptStatus, ReceiptType, UserType
 from app.models import User, Organization, Region, OrganizationType, InviteLink, Receipt, Product
 
 from bs4 import BeautifulSoup
-from playwright.async_api import async_playwright
+import requests
 
 import os
 from datetime import datetime
@@ -83,9 +83,7 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
     items = []
     total_amount = None
     total_quantity = None
-    ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
     if ofd_url:
-        ofd_url = "https://ofd.soliq.uz/check?t=VG343420028900&r=25708&c=20250514190427&s=312550081784"
         try:
             items = await parse_ofd_page(ofd_url)
             total_amount = sum(item['price_sum'] for item in items)
@@ -122,13 +120,8 @@ async def save_receipt(photo_saved_path, ofd_url, user, status=None):
 
 
 async def parse_ofd_page(ofd_url: str):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        await page.goto(ofd_url, wait_until="networkidle")
-
-        html = await page.content()
-        await browser.close()
+    response = requests.get(ofd_url)
+    html = response.text
 
     soup = BeautifulSoup(html, "lxml")
 
