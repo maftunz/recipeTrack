@@ -18,18 +18,6 @@ MEDIA_ROOT = "media/receipts"
 
 
 @sync_to_async
-def get_all_regions():
-    return list(Region.objects.all())
-
-@sync_to_async
-def get_region_by_name(name):
-    return Region.objects.filter(name_ru=name).first()
-
-@sync_to_async
-def get_organization_by_name(name):
-    return Organization.objects.filter(name=name).first()
-
-@sync_to_async
 def get_registered_user(telegram_id: int):
     return User.objects.filter(telegram_id=telegram_id).first()
 

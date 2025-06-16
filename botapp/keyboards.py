@@ -31,16 +31,6 @@ def get_user_type_keyboard(lang: str) -> ReplyKeyboardMarkup:
     )
 
 
-def get_regions_keyboard(regions) -> ReplyKeyboardMarkup:
-    return ReplyKeyboardMarkup(
-        keyboard=[[
-            KeyboardButton(text=region.name_ru)] for region in regions
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
-
-
 def get_phone_request_keyboard(lang) -> ReplyKeyboardMarkup:
     text = "Отправить номер телефона"
     if lang == 'uz':

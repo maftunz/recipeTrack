@@ -21,21 +21,12 @@ receipt_router = Router()
 @receipt_router.message(RecipeTrack.request_recipe)
 async def recipe_requested(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    user_type = data['user_type']
     lang = data['lang']
-    if user_type == UserType.DOCTOR.value:
-        if lang == "ru":
-            await message.answer(f"Пожалуйста отправьте фотографию рецепта", reply_markup=ReplyKeyboardRemove())
-        else:
-            await message.answer(f"Iltimos retsept rasmini yuboring", reply_markup=ReplyKeyboardRemove())
-        await state.set_state(RecipeTrack.sending_recipe)
+    if lang == "ru":
+        await message.answer(f"Пожалуйста отправьте фотографию рецепта", reply_markup=ReplyKeyboardRemove())
     else:
-        if lang == "ru":
-            await message.answer(f"Пожалуйста отправьте фотографию чека", reply_markup=ReplyKeyboardRemove())
-        else:
-            await message.answer(f"Iltimos chek rasmini yuboring", reply_markup=ReplyKeyboardRemove())
-        await state.set_state(RecipeTrack.sending_cheque)
-
+        await message.answer(f"Iltimos retsept rasmini yuboring", reply_markup=ReplyKeyboardRemove())
+    await state.set_state(RecipeTrack.sending_recipe)
 
 @receipt_router.message(RecipeTrack.sending_recipe, F.photo)
 async def recipe_received(message: types.Message, state: FSMContext):
@@ -78,6 +69,15 @@ async def recipe_received(message: types.Message, state: FSMContext):
         print(f"❌ Ошибка: {e}")
         raise e
 
+@receipt_router.message(RecipeTrack.request_cheque)
+async def cheque_requested(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data['lang']
+    if lang == "ru":
+        await message.answer(f"Пожалуйста отправьте фотографию чека", reply_markup=ReplyKeyboardRemove())
+    else:
+        await message.answer(f"Iltimos chek rasmini yuboring", reply_markup=ReplyKeyboardRemove())
+    await state.set_state(RecipeTrack.sending_cheque)
 
 @receipt_router.message(RecipeTrack.sending_cheque, F.photo)
 async def cheque_received(message: types.Message, state: FSMContext):

@@ -10,13 +10,10 @@ from aiogram.types import ReplyKeyboardRemove
 
 from app.enums import UserType
 
-from ..keyboards import get_user_type_keyboard, get_regions_keyboard, get_phone_request_keyboard, get_language_keyboard, \
+from ..keyboards import get_user_type_keyboard, get_phone_request_keyboard, get_language_keyboard, \
     get_user_menu
 from ..states import Registration, RecipeTrack
-from ..services import (
-    get_all_regions, get_region_by_name, get_registered_user, get_active_invite_link, save_user,
-    get_organization_by_name, parse_ofd_page
-)
+from ..services import get_registered_user, get_active_invite_link, save_user
 
 registration_router = Router()
 
@@ -38,7 +35,10 @@ async def start_registration(message: types.Message, command: CommandObject, sta
 
         await state.clear()
         await state.update_data(user_type=existing_user.user_type, lang=existing_user.language)
-        await state.set_state(RecipeTrack.request_recipe)
+        if existing_user.user_type == UserType.PHARMACIST:
+            await state.set_state(RecipeTrack.request_cheque)
+        else:
+            await state.set_state(RecipeTrack.request_recipe)
         return
 
     if token:
@@ -46,8 +46,8 @@ async def start_registration(message: types.Message, command: CommandObject, sta
         if invite:
             await state.update_data(invite_token=token, organization_id=invite.organization_id)
 
-    await message.answer("Пожалуйста, выберите язык:\nIltimos, tilni tanlang:", reply_markup=get_language_keyboard())
-    await state.set_state(Registration.choosing_language)
+        await message.answer("Пожалуйста, выберите язык:\nIltimos, tilni tanlang:", reply_markup=get_language_keyboard())
+        await state.set_state(Registration.choosing_language)
 
 
 @registration_router.message(Registration.choosing_language)
@@ -108,48 +108,6 @@ async def full_name_entered(message: types.Message, state: FSMContext):
             await message.answer("Iltimos, quyidagi tugma orqali telefon raqamingizni yuboring:",
                                  reply_markup=get_phone_request_keyboard(lang))
         await state.set_state(Registration.entering_phone)
-    else:
-        regions = await get_all_regions()
-        await message.answer("Выберите ваш регион:", reply_markup=get_regions_keyboard(regions))
-        await state.set_state(Registration.choosing_region)
-
-
-@registration_router.message(Registration.choosing_region)
-async def region_selected(message: types.Message, state: FSMContext):
-    region = await get_region_by_name(message.text.strip())
-    data = await state.get_data()
-    lang = data['lang']
-    if not region:
-        if lang == "ru":
-            await message.answer("Пожалуйста, выберите регион из предложенных кнопок.")
-        else:
-            await message.answer("Iltimos, taklif etilgan tugmalardan birini bosib, hududingizni tanlang.")
-        return
-
-    await state.update_data(region_id=region.id)
-    if lang == "ru":
-        await message.answer("Введите название вашей организации:")
-    else:
-        await message.answer("Tashkilotingiz nomini kiriting:")
-    await state.set_state(Registration.choosing_organization)
-
-
-@registration_router.message(Registration.choosing_organization)
-async def organization_entered(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data['lang']
-    await state.update_data(organization=message.text)
-    organization = await get_organization_by_name(message.text.strip())
-    if organization:
-        await state.update_data(organization_id=organization.id)
-
-    if lang == "ru":
-        await message.answer("Пожалуйста, отправьте ваш номер телефона, используя кнопку ниже:",
-                         reply_markup=get_phone_request_keyboard(lang))
-    else:
-        await message.answer("Iltimos, quyidagi tugma orqali telefon raqamingizni yuboring:",
-                             reply_markup=get_phone_request_keyboard(lang))
-    await state.set_state(Registration.entering_phone)
 
 
 @registration_router.message(F.content_type == types.ContentType.CONTACT, Registration.entering_phone)

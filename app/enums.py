@@ -46,8 +46,8 @@ USER_TYPE_TRANSLATIONS = {
 
 
 class OrganizationType(TextChoices):
-    PHARMACY = 'pharmacy', 'Pharmacy'
-    MEDICAL_INSTITUTION = 'medical_institution', 'Medical Institution'
+    PHARMACY = 'pharmacy', 'Аптека'
+    MEDICAL_INSTITUTION = 'medical_institution', 'Медицинское учреждение'
 
 
 class Language(TextChoices):
@@ -58,3 +58,14 @@ class Language(TextChoices):
 class ReceiptType(TextChoices):
     PRESCRIPTION = 'prescription', 'Рецепт'
     CHECK = 'check', 'Чек'
+
+
+class WinnerCriteria(TextChoices):
+    BY_COUNT = 'count', 'По количеству'
+    BY_TOTAL_AMOUNT = 'total_amount', 'По сумме'
+
+
+class GiveawayUserType(TextChoices):
+    ALL = 'all', 'Все'
+    DOCTOR = "doctor", 'Врачи'
+    PHARMACIST = "pharmacist", 'Фармацевты'

@@ -18,6 +18,15 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.utils import translation
+
+def activate_russian_middleware(get_response):
+    def middleware(request):
+        translation.activate('ru')
+        response = get_response(request)
+        translation.deactivate()
+        return response
+    return middleware
 
 urlpatterns = [
     path('admin/', admin.site.urls),
