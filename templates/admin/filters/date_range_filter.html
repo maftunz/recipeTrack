@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<div class="filter-date-range" style="padding: 10px;">
+    <h3>{{ spec.title }}</h3>
+    <label>{% trans "От" %}:</label>
+    <input type="date" name="created_at__gte" value="{{ request.GET.created_at__gte|default_if_none:'' }}">
+
+    <label>{% trans "До" %}:</label>
+    <input type="date" name="created_at__lte" value="{{ request.GET.created_at__lte|default_if_none:'' }}">
+
+    <button type="submit" class="button">{% trans "Применить" %}</button>
+</div>

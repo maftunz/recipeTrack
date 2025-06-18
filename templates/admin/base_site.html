@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block branding %}
+  <h1 id="site-name"><a href="{% url 'admin:index' %}">Shifokor Admin</a></h1>
+  <div style="margin-top: 10px;">
+    <a href="{% url 'user_statistics' %}" class="button">Статистика по врачам</a>
+  </div>
+{% endblock %}

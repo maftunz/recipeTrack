@@ -20,6 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.utils import translation
 
+from app.admin import statistics_view
+
 def activate_russian_middleware(get_response):
     def middleware(request):
         translation.activate('ru')
@@ -29,6 +31,7 @@ def activate_russian_middleware(get_response):
     return middleware
 
 urlpatterns = [
+    path('admin/statistics/', admin.site.admin_view(statistics_view), name='user_statistics'),
     path('admin/', admin.site.urls),
 ]
 

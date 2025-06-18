@@ -1,0 +1,30 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+
+  <a href="{{ back_url }}" class="button">Вернуться к полному списку</a>
+  <table class="adminlist table table-striped table-bordered" style="margin-top: 20px;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Врач</th>
+        <th>Кол-во рецептов</th>
+        <th>Сумма</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in user_stats %}
+        <tr>
+          <td>{{ row.user__id }}</td>
+          <td>{{ row.user__full_name }}</td>
+          <td>{{ row.total_receipts }}</td>
+          <td>{{ row.total_amount|floatformat:2 }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">Нет данных</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

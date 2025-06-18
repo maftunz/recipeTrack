@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+
+{% block result_list %}
+    {{ block.super }}
+
+    {% if cl.result_count %}
+        <table style="width: 100%;">
+            <tr>
+                <td>Итого:</td>
+                <td>Общее количество: {{ total_quantity }}</td>
+                <td>Общая сумма: {{ total_amount }}</td>
+            </tr>
+        </table>
+    {% endif %}
+{% endblock %}

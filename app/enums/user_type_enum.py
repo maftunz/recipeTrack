@@ -1,14 +1,5 @@
 from typing import Optional
-
-from django.db.models import TextChoices
 from enum import Enum
-
-
-class ReceiptStatus(TextChoices):
-    PENDING = 'pending', 'Pending'
-    APPROVED = 'approved', 'Approved'
-    REJECTED = 'rejected', 'Rejected'
-
 
 class UserType(Enum):
     DOCTOR = "doctor"
@@ -32,7 +23,6 @@ class UserType(Enum):
                 return key
         return None
 
-
 USER_TYPE_TRANSLATIONS = {
     "doctor": {
         "en": "Doctor",
@@ -43,29 +33,3 @@ USER_TYPE_TRANSLATIONS = {
         "ru": "Фармацевт",
     },
 }
-
-
-class OrganizationType(TextChoices):
-    PHARMACY = 'pharmacy', 'Аптека'
-    MEDICAL_INSTITUTION = 'medical_institution', 'Медицинское учреждение'
-
-
-class Language(TextChoices):
-    RU = 'ru', 'Russian'
-    UZ = 'uz', 'Uzbek'
-
-
-class ReceiptType(TextChoices):
-    PRESCRIPTION = 'prescription', 'Рецепт'
-    CHECK = 'check', 'Чек'
-
-
-class WinnerCriteria(TextChoices):
-    BY_COUNT = 'count', 'По количеству'
-    BY_TOTAL_AMOUNT = 'total_amount', 'По сумме'
-
-
-class GiveawayUserType(TextChoices):
-    ALL = 'all', 'Все'
-    DOCTOR = "doctor", 'Врачи'
-    PHARMACIST = "pharmacist", 'Фармацевты'
