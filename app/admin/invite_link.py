@@ -5,7 +5,7 @@ import uuid
 
 from ..models import InviteLink, Organization, Admin
 
-bot_username = 'shifokor_soft_bot'
+bot_username = 'dorixonasoft_bot'
 
 class InviteLinkForm(forms.ModelForm):
     class Meta:
