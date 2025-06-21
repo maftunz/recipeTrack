@@ -2,8 +2,8 @@ from collections import defaultdict
 
 from asgiref.sync import sync_to_async
 
-from app.enums import ReceiptStatus, ReceiptType, UserType
-from app.models import User, Organization, Region, OrganizationType, InviteLink, Receipt, Product
+from app.enums import ReceiptStatus, ReceiptType, UserType, OrganizationType
+from app.models import User, Organization, InviteLink, Receipt, Product
 
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright

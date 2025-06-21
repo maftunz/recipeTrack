@@ -7,7 +7,7 @@ from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
-from app.enums import UserType, ReceiptStatus
+from app.enums import ReceiptStatus
 
 from ..keyboards import get_user_menu
 from ..states import RecipeTrack

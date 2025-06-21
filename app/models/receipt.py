@@ -12,7 +12,7 @@ class Receipt(models.Model):
     photo = models.CharField(max_length=255, verbose_name="Фото")
     ofd_url = models.CharField(max_length=255, null=True, blank=True, verbose_name="Ссылка Soliq")
     items = models.JSONField(null=True, blank=True, verbose_name="Продукты")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Сумма")
+    amount = models.FloatField(null=True, blank=True, verbose_name="Сумма")
     quantity = models.PositiveIntegerField(null=True, blank=True, verbose_name="Количество")
     type = models.CharField(
         max_length=20,
